@@ -1,6 +1,6 @@
 import { Navbar } from "../../components/navbar";
 import "./main.css";
-import { Header } from "../../components/elements";
+import { CustomHr, Header } from "../../components/elements";
 import { MenuBar } from "../../components/menu-bar";
 
 const Lead = () => {
@@ -9,9 +9,11 @@ const Lead = () => {
             <Navbar />
             <Header heading="Clients" />
 
-            <hr />
+            <hr style={{margin: 0}} />
 
             <MenuBar />
+
+            <CustomHr />
         </main>
     )
 };
