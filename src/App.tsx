@@ -1,10 +1,8 @@
-import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
+import { ApolloProvider } from "@apollo/client";
+import { getApolloClient } from "./graphql/configuration";
 import Routes from "./Routes";
 
-const client = new ApolloClient({
-  uri: `${process.env.REACT_APP_URL}/graphql`,
-  cache: new InMemoryCache(),
-});
+const client = getApolloClient()
 
 function App() {
   return (
