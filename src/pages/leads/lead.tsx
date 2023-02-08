@@ -2,29 +2,12 @@ import { Navbar } from "../../components/navbar";
 import "./main.css";
 import { CustomHr, Header } from "../../components/elements";
 import { MenuBar } from "../../components/menu-bar";
-import { useLazyQuery } from "@apollo/client";
-import { LEAD_QUERY } from "../../graphql/queries";
-import { useEffect } from "react";
+import { Lead as LeadType } from "../../types/lead";
+import { useState } from "react";
+import { LeadBody } from "../../components/lead-body";
 
 const Lead = () => {
-    const [fetchLead, {data: result, error}] = useLazyQuery(LEAD_QUERY);
-
-    useEffect(() => {
-        fetchLead({
-            variables: {
-                pagination: {
-                    page: 1,
-                    pageSize: 10
-                }
-            }
-        })
-    }, []);
-
-    useEffect(() => {
-        if(error) console.log(error);
-
-        else console.log(result)
-    }, [result, error]);
+    const [leads, setLeads] = useState<Array<LeadType>>([]);
 
     return (
         <main>
@@ -36,6 +19,8 @@ const Lead = () => {
             <MenuBar />
 
             <CustomHr />
+
+            <LeadBody leads={leads} setLeads={setLeads} />
         </main>
     )
 };
