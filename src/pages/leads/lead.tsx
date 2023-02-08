@@ -1,6 +1,7 @@
 import { Navbar } from "../../components/navbar";
 import "./main.css";
 import { Header } from "../../components/elements";
+import { MenuBar } from "../../components/menu-bar";
 
 const Lead = () => {
     return (
@@ -9,6 +10,8 @@ const Lead = () => {
             <Header heading="Clients" />
 
             <hr />
+
+            <MenuBar />
         </main>
     )
 };
