@@ -14,12 +14,29 @@ const LeadBody = (props: Props) => {
     const { data, loading, error, fetchMore } = useQuery(LEAD_QUERY);
 
     useEffect(() => {
-        if(data?.leads?.data) setLeads(data?.leads?.data);
+        console.log(data?.leads?.data)
+        if (data?.leads?.data) setLeads(data?.leads?.data);
     }, [data]);
 
-    return(
-        <></>
-    )
+    return (
+        <div style={{
+            overflowX: "scroll",
+            width: "100%",
+            padding: "0 10px"
+        }}>
+            <div style={{
+                display: "grid"
+            }}>
+                <div>Last Date</div>
+                <div>Last Date</div>
+                <div>Last Date</div>
+                <div>Last Date</div>
+                <div>Last Date</div>
+                <div>Last Date</div>
+                <div>Last Date</div>
+            </div>
+        </div>
+    );
 };
 
 export default LeadBody;
