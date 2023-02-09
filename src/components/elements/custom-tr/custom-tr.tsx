@@ -1,11 +1,43 @@
 import { Lead } from "../../../types/lead";
+import { BsThreeDotsVertical } from "react-icons/bs";
+import Dropdown from "react-bootstrap/Dropdown";
+import { Dispatch, SetStateAction } from "react";
+import { useMutation } from "@apollo/client";
+import { DELETE_LEAD_MUTATION } from "../../../graphql/mutations";
 
 interface Props {
     lead: Lead;
+    setLeads: Dispatch<SetStateAction<Array<Lead>>>;
 }
 
 const CustomTr = (props: Props) => {
-    const { lead } = props;
+    const { lead, setLeads } = props;
+
+    const [ deleteLead ] = useMutation(DELETE_LEAD_MUTATION);
+
+    const onDeleteClick = async () => {
+        const { data, errors } = await deleteLead({
+            variables: {
+                id: lead.id
+            }
+        });
+
+        if(errors) {
+            console.log(errors);
+            return;
+        }
+
+        if(data?.deletedLead?.data === null) {
+            console.log("Data does not exists!!");
+            return;
+        }
+
+        setLeads(prev => {
+            const filteredData = prev.filter((data) => data.id !== lead.id);
+
+            return filteredData;
+        });
+    }
 
     return (
         <tr>
@@ -45,9 +77,7 @@ const CustomTr = (props: Props) => {
                     fontWeight: 500,
                 }}
             >
-                {lead.attributes.Source
-                    ? lead.attributes.Source
-                    : "None"}
+                {lead.attributes.Source ? lead.attributes.Source : "None"}
             </td>
             <td
                 style={{
@@ -86,6 +116,19 @@ const CustomTr = (props: Props) => {
                             : "None"}
                     </div>
                 </div>
+            </td>
+            <td>
+                <Dropdown>
+                    <Dropdown.Toggle variant="success" id="dropdown-basic">
+                        <BsThreeDotsVertical />
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu>
+                        <Dropdown.Item>Edit</Dropdown.Item>
+                        <Dropdown.Item>View</Dropdown.Item>
+                        <Dropdown.Item onClick={onDeleteClick}>Delete</Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>
             </td>
         </tr>
     );

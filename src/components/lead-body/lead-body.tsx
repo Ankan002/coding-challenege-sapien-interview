@@ -4,6 +4,7 @@ import { LEAD_QUERY } from "../../graphql/queries";
 import { Lead } from "../../types/lead";
 import { CustomTr } from "../elements";
 import { TableHead } from "../table-head";
+import "./index.css";
 
 interface Props {
     leads: Array<Lead>;
@@ -67,7 +68,7 @@ const LeadBody = (props: Props) => {
     return (
         <>
             <div
-                className="table-responsive text-nowrap mt-4 px-4"
+                className="table-responsive text-nowrap mt-4 px-4 vh-100"
                 style={{
                     overflowX: "scroll",
                 }}
@@ -76,7 +77,7 @@ const LeadBody = (props: Props) => {
                     <TableHead />
                     <tbody>
                         {leads.map((lead) => (
-                            <CustomTr key={lead.id} lead={lead} />
+                            <CustomTr key={lead.id} lead={lead} setLeads={setLeads} />
                         ))}
                     </tbody>
                 </table>
