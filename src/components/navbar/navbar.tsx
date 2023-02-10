@@ -1,7 +1,14 @@
+import { Dispatch, SetStateAction } from "react";
 import { Navbar as BootstrapNavbar } from "react-bootstrap";
 import { BsFillGrid3X3GapFill, BsBell, BsFillCircleFill } from "react-icons/bs";
 
-const Navbar = () => {
+interface Props {
+    setCollapseMenuOpen: Dispatch<SetStateAction<boolean>>;
+}
+
+const Navbar = (props: Props) => {
+    const { setCollapseMenuOpen } = props;
+
     return (
         <BootstrapNavbar
             bg="dark"
@@ -20,7 +27,7 @@ const Navbar = () => {
 
                 <div className="col-6 col-md-4 d-flex align-items-center justify-content-end">
                     <BsBell className="text-white mx-2" size={20} />
-                    <BsFillGrid3X3GapFill className="text-white mx-2" size={20} />
+                    <BsFillGrid3X3GapFill className="text-white mx-2" style={{cursor: "pointer"}} size={20} onClick={() => setCollapseMenuOpen(prev => !prev)} />
                     <BsFillCircleFill className="text-white mx-2" size={20} />
                 </div>
         </BootstrapNavbar>
