@@ -6,6 +6,8 @@ import { UPDATE_LEAD_MUTATION } from "../../graphql/mutations";
 import { Lead } from "../../types/lead";
 import { CustomHr, ModalInput } from "../elements";
 import { validateEmail } from "../utils/validate-email";
+import Select from "react-select";
+import { sourceOptions, statusOptions } from "../../constants";
 
 interface Props {
     isOpen: boolean;
@@ -21,16 +23,40 @@ const UpdateLeadModal = (props: Props) => {
     const [email, setEmail] = useState<string>("");
     const [notes, setNotes] = useState<string>("");
     const [isSaving, setIsSaving] = useState<boolean>(false);
+    const [selectedStatus, setSelectedStatus] = useState({
+        value: "none",
+        label: "None",
+    });
+    const [selectedSource, setSelectedSource] = useState({
+        value: "none",
+        label: "None",
+    });
 
-    const [ updateLead ] = useMutation(UPDATE_LEAD_MUTATION);
+    const [updateLead] = useMutation(UPDATE_LEAD_MUTATION);
 
     const onSaveLeadClick = async () => {
-        if(isSaving) return;
+        if (isSaving) return;
 
         setIsSaving(true);
         const loadingToastId = toast.loading("Saving the document");
 
-        if(name.trim().length < 3) {
+        if (selectedStatus.value === "none") {
+            toast.remove(loadingToastId);
+            toast.error("Please pick a status");
+
+            setIsSaving(false);
+            return;
+        }
+
+        if (selectedSource.value === "none") {
+            toast.remove(loadingToastId);
+            toast.error("Please pick a source");
+
+            setIsSaving(false);
+            return;
+        }
+
+        if (name.trim().length < 3) {
             toast.remove(loadingToastId);
             toast.error("Enter a name!!");
 
@@ -38,7 +64,7 @@ const UpdateLeadModal = (props: Props) => {
             return;
         }
 
-        if(!validateEmail(email.trim())){
+        if (!validateEmail(email.trim())) {
             toast.remove(loadingToastId);
             toast.error("Enter a valid email!!");
 
@@ -46,28 +72,31 @@ const UpdateLeadModal = (props: Props) => {
             return;
         }
 
-        const {data, errors} = await updateLead({
+        const { data, errors } = await updateLead({
             variables: {
                 id: lead.id,
                 data: {
                     Name: name,
                     email: email,
-                    Notes: notes
-                }
-            }
+                    Notes: notes,
+                    Status: selectedStatus.value,
+                    Source: selectedSource.value,
+                },
+            },
         });
 
         toast.remove(loadingToastId);
         setIsSaving(false);
 
-        if(errors) {
+        if (errors) {
             toast.error(errors[0].message);
             return;
         }
 
-        setLeads(prevLeads => {
+        setLeads((prevLeads) => {
             const newLeads = prevLeads.map((prevLead) => {
-                if(lead.id === prevLead.id && data.updateLead.data) return data.updateLead.data
+                if (lead.id === prevLead.id && data.updateLead.data)
+                    return data.updateLead.data;
                 return prevLead;
             });
 
@@ -83,6 +112,17 @@ const UpdateLeadModal = (props: Props) => {
         if (lead.attributes.Name) setName(lead.attributes.Name);
         if (lead.attributes.email) setEmail(lead.attributes.email);
         if (lead.attributes.Notes) setNotes(lead.attributes.Notes);
+        if (lead.attributes.Status)
+            statusOptions.forEach((option) => {
+                if (option.value === lead.attributes.Status)
+                    setSelectedStatus(option);
+            });
+
+        if (lead.attributes.Source)
+            sourceOptions.forEach((option) => {
+                if (option.value === lead.attributes.Source)
+                    setSelectedSource(option);
+            });
     }, [lead]);
 
     return (
@@ -92,6 +132,38 @@ const UpdateLeadModal = (props: Props) => {
             </Modal.Header>
 
             <Modal.Body>
+                <h4>Status</h4>
+
+                <Select
+                    options={statusOptions}
+                    value={selectedStatus}
+                    styles={{
+                        container: (base) => ({
+                            ...base,
+                            width: "40%",
+                        }),
+                    }}
+                    onChange={(v) => {
+                        if (v) setSelectedStatus(v);
+                    }}
+                />
+
+                <h4 className="mt-4">Source</h4>
+
+                <Select
+                    options={sourceOptions}
+                    value={selectedSource}
+                    styles={{
+                        container: (base) => ({
+                            ...base,
+                            width: "40%",
+                        }),
+                    }}
+                    onChange={(v) => {
+                        if (v) setSelectedSource(v);
+                    }}
+                />
+
                 <h4 className="mt-5">Lead Details</h4>
 
                 <CustomHr withMargin={false} />
