@@ -85,6 +85,8 @@ const NewLeadModal = (props: Props) => {
             toast.success("Successfully created Lead!!");
             setOpen(false);
         }
+
+        toast.success("Lead Created!!");
     }
 
     return (

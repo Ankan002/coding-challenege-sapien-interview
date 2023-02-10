@@ -5,6 +5,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { useMutation } from "@apollo/client";
 import { DELETE_LEAD_MUTATION } from "../../../graphql/mutations";
 import { ViewLeadModal } from "../../view-lead-modal";
+import { UpdateLeadModal } from "../../update-lead-modal";
 
 interface Props {
     lead: Lead;
@@ -16,6 +17,7 @@ const CustomTr = (props: Props) => {
 
     const [ deleteLead ] = useMutation(DELETE_LEAD_MUTATION);
     const [ isViewLeadModalOpen, setIsViewLeadModalOpen ] = useState<boolean>(false);
+    const [ isUpdateLeadModalOpen, setIsUpdateLeadModalOpen ] = useState<boolean>(false);
 
     const onDeleteClick = async () => {
         const { data, errors } = await deleteLead({
@@ -126,7 +128,7 @@ const CustomTr = (props: Props) => {
                     </Dropdown.Toggle>
 
                     <Dropdown.Menu>
-                        <Dropdown.Item>Edit</Dropdown.Item>
+                        <Dropdown.Item onClick={() => setIsUpdateLeadModalOpen(!isUpdateLeadModalOpen)}>Edit</Dropdown.Item>
                         <Dropdown.Item onClick={() => setIsViewLeadModalOpen(!isViewLeadModalOpen)}>View</Dropdown.Item>
                         <Dropdown.Item onClick={onDeleteClick}>Delete</Dropdown.Item>
                     </Dropdown.Menu>
@@ -134,6 +136,8 @@ const CustomTr = (props: Props) => {
             </td>
 
             <ViewLeadModal isOpen={isViewLeadModalOpen} setOpen={setIsViewLeadModalOpen} lead={lead} />
+
+            <UpdateLeadModal isOpen={isUpdateLeadModalOpen} setOpen={setIsUpdateLeadModalOpen} setLeads={setLeads} lead={lead} />
         </tr>
     );
 };
