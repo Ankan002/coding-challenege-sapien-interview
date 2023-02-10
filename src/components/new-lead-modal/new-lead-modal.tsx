@@ -8,32 +8,56 @@ import { CREATE_LEAD_MUTATION } from "../../graphql/mutations";
 import { toast } from "react-hot-toast";
 import { validateEmail } from "../utils/validate-email";
 import moment from "moment";
+import { sourceOptions, statusOptions } from "../../constants";
+import Select from "react-select";
 
 interface Props {
     isOpen: boolean;
     setOpen: Dispatch<SetStateAction<boolean>>;
-    setLeads: Dispatch<SetStateAction<Array<Lead>>>
+    setLeads: Dispatch<SetStateAction<Array<Lead>>>;
 }
 
 const NewLeadModal = (props: Props) => {
     const { isOpen, setOpen, setLeads } = props;
 
-    const [selectedSource, setSelectedSource] = useState<string>("website");
-    const [selectedStatus, setSelectedStatus] = useState<string>("New");
+    const [selectedStatus, setSelectedStatus] = useState({
+        value: "none",
+        label: "None",
+    });
+    const [selectedSource, setSelectedSource] = useState({
+        value: "none",
+        label: "None",
+    });
     const [name, setName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [notes, setNotes] = useState<string>("");
     const [isSaving, setIsSaving] = useState<boolean>(false);
 
-    const [ createLead ] = useMutation(CREATE_LEAD_MUTATION);
+    const [createLead] = useMutation(CREATE_LEAD_MUTATION);
 
     const onSaveLeadClick = async () => {
-        if(isSaving) return;
+        if (isSaving) return;
 
         setIsSaving(true);
         const loadingToastId = toast.loading("Saving the document");
 
-        if(name.trim().length < 3) {
+        if (selectedStatus.value === "none") {
+            toast.remove(loadingToastId);
+            toast.error("Please pick a status");
+
+            setIsSaving(false);
+            return;
+        }
+
+        if (selectedSource.value === "none") {
+            toast.remove(loadingToastId);
+            toast.error("Please pick a source");
+
+            setIsSaving(false);
+            return;
+        }
+
+        if (name.trim().length < 3) {
             toast.remove(loadingToastId);
             toast.error("Enter a name!!");
 
@@ -41,7 +65,7 @@ const NewLeadModal = (props: Props) => {
             return;
         }
 
-        if(!validateEmail(email.trim())){
+        if (!validateEmail(email.trim())) {
             toast.remove(loadingToastId);
             toast.error("Enter a valid email!!");
 
@@ -57,37 +81,41 @@ const NewLeadModal = (props: Props) => {
                 data: {
                     Name: name.trim(),
                     email: email.trim(),
-                    Source: selectedSource,
-                    Status: selectedStatus,
+                    Source: selectedSource.value,
+                    Status: selectedStatus.value,
                     Time: currentTime,
                     date: currentDate,
-                    Notes: notes.trim().length > 1 ? notes.trim() : null
-                }
-            }
+                    Notes: notes.trim().length > 1 ? notes.trim() : null,
+                },
+            },
         });
 
         toast.remove(loadingToastId);
         setIsSaving(false);
 
-        if(errors) {
+        if (errors) {
             toast.error(errors[0].message);
             return;
         }
 
         setName("");
         setEmail("");
-        setSelectedSource("website");
-        setSelectedStatus("New");
+        setSelectedSource({
+            value: "none",
+            label: "None",
+        });
+        setSelectedStatus({
+            value: "none",
+            label: "None",
+        });
         setNotes("");
 
-        if(data.createLead.data) {
+        if (data.createLead.data) {
             setLeads((leads) => [data.createLead.data, ...leads]);
             toast.success("Successfully created Lead!!");
             setOpen(false);
         }
-
-        toast.success("Lead Created!!");
-    }
+    };
 
     return (
         <Modal show={isOpen} onHide={() => setOpen(false)}>
@@ -98,67 +126,54 @@ const NewLeadModal = (props: Props) => {
             <Modal.Body className="px-2">
                 <h4>Status</h4>
 
-                <select
+                <Select
+                    options={statusOptions}
                     value={selectedStatus}
-                    onChange={(e) => setSelectedStatus(e.target.value)}
-                    style={{
-                        padding: 5,
-                        border: "1px solid #000",
-                        borderRadius: 5,
+                    styles={{
+                        container: (base) => ({
+                            ...base,
+                            width: "40%",
+                        }),
                     }}
-                >
-                    <option value="New" label="New">
-                        New
-                    </option>
-                    <option value="Interested" label="Interested">
-                        Interested
-                    </option>
-                    <option value="Follow_up" label="Follow Up">
-                        Follow Up
-                    </option>
-                    <option value="Negative" label="Negative">
-                        Negative
-                    </option>
-                    <option value="Enrolled" label="Enrolled">
-                        Enrolled
-                    </option>
-                </select>
+                    onChange={(v) => {
+                        if (v) setSelectedStatus(v);
+                    }}
+                />
 
                 <h4 className="mt-4">Source</h4>
 
-                <select
+                <Select
+                    options={sourceOptions}
                     value={selectedSource}
-                    onChange={(e) => setSelectedSource(e.target.value)}
-                    style={{
-                        padding: 5,
-                        border: "1px solid #000",
-                        borderRadius: 5,
+                    styles={{
+                        container: (base) => ({
+                            ...base,
+                            width: "40%",
+                        }),
                     }}
-                >
-                    <option value="website" label="Website">
-                        Website
-                    </option>
-                    <option value="google" label="Google">
-                        Google
-                    </option>
-                    <option value="my_app" label="My App">
-                        My App
-                    </option>
-                    <option value="word_of_mouth" label="Word Of Mouth">
-                        Word Of Mouth
-                    </option>
-                </select>
+                    onChange={(v) => {
+                        if (v) setSelectedSource(v);
+                    }}
+                />
 
                 <h4 className="mt-5">Lead Details</h4>
 
                 <CustomHr withMargin={false} />
 
-                <ModalInput 
-                    title="Name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter your name" editable={true}
+                <ModalInput
+                    title="Name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Enter your name"
+                    editable={true}
                 />
 
-                <ModalInput 
-                    title="Email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ankanbhattacharya89@gmail.com" editable={true}
+                <ModalInput
+                    title="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="ankanbhattacharya89@gmail.com"
+                    editable={true}
                     type="email"
                 />
 
@@ -175,12 +190,15 @@ const NewLeadModal = (props: Props) => {
                     }}
                     placeholder="Enter the notes here..."
                     value={notes}
-                    onChange={e => setNotes(e.target.value)}
+                    onChange={(e) => setNotes(e.target.value)}
                 ></textarea>
             </Modal.Body>
 
             <Modal.Footer className="w-100 d-flex align-items-center justify-content-center">
-                <button className="btn btn-success rounded w-25" onClick={onSaveLeadClick}>
+                <button
+                    className="btn btn-success rounded w-25"
+                    onClick={onSaveLeadClick}
+                >
                     Save
                 </button>
             </Modal.Footer>
