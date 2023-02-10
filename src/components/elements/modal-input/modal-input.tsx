@@ -2,7 +2,7 @@ import { ChangeEvent, HTMLInputTypeAttribute } from "react";
 
 interface Props {
     value: string;
-    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+    onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
     title: string;
     placeholder: string;
     editable: boolean;

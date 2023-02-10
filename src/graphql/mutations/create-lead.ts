@@ -13,6 +13,7 @@ export const CREATE_LEAD_MUTATION = gql`
                     Source
                     updatedAt
                     Status
+                    Notes
                 }
             }
         }

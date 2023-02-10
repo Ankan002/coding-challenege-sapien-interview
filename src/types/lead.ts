@@ -9,5 +9,6 @@ export interface Lead {
         updatedAt: string | null;
         Status: string | null;
         createdAt: string | null;
+        Notes: string | null;
     }
 }

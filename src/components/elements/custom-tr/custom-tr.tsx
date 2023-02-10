@@ -1,9 +1,10 @@
 import { Lead } from "../../../types/lead";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import Dropdown from "react-bootstrap/Dropdown";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { useMutation } from "@apollo/client";
 import { DELETE_LEAD_MUTATION } from "../../../graphql/mutations";
+import { ViewLeadModal } from "../../view-lead-modal";
 
 interface Props {
     lead: Lead;
@@ -14,6 +15,7 @@ const CustomTr = (props: Props) => {
     const { lead, setLeads } = props;
 
     const [ deleteLead ] = useMutation(DELETE_LEAD_MUTATION);
+    const [ isViewLeadModalOpen, setIsViewLeadModalOpen ] = useState<boolean>(false);
 
     const onDeleteClick = async () => {
         const { data, errors } = await deleteLead({
@@ -125,11 +127,13 @@ const CustomTr = (props: Props) => {
 
                     <Dropdown.Menu>
                         <Dropdown.Item>Edit</Dropdown.Item>
-                        <Dropdown.Item>View</Dropdown.Item>
+                        <Dropdown.Item onClick={() => setIsViewLeadModalOpen(!isViewLeadModalOpen)}>View</Dropdown.Item>
                         <Dropdown.Item onClick={onDeleteClick}>Delete</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
             </td>
+
+            <ViewLeadModal isOpen={isViewLeadModalOpen} setOpen={setIsViewLeadModalOpen} lead={lead} />
         </tr>
     );
 };

@@ -13,6 +13,7 @@ export const LEAD_QUERY = gql`
                     Source
                     updatedAt
                     Status
+                    Notes
                 }
             }
         }
